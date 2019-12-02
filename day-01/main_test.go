@@ -24,3 +24,22 @@ func TestFuel(t *testing.T) {
 		})
 	}
 }
+
+
+func TestFuel_Extended(t *testing.T) {
+	testCases := []struct{
+		Mass int64
+		ExpectedFuel int64
+	}{
+		{14, 2},
+		{1969, 966},
+		{100756, 50346},
+	}
+
+	for _, c := range testCases {
+		t.Run(fmt.Sprintf("mass-%d", c.Mass), func (t *testing.T) {
+			fuel := GetFuelExtended(c.Mass)
+			assert.Equal(t, c.ExpectedFuel, fuel)
+		})
+	}
+}

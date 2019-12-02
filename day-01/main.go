@@ -15,6 +15,21 @@ func GetFuel(mass int64) int64 {
 	return int64(math.Floor(d)) - 2
 }
 
+
+func GetFuelExtended(mass int64) int64 {
+	fuel := GetFuel(mass)
+	totalFuel := fuel
+	for {
+		fuel = GetFuel(fuel)
+		if fuel <= 0 {
+			break
+		}
+		totalFuel = totalFuel + fuel
+	}
+
+	return totalFuel
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	totalFuel := int64(0)
@@ -25,7 +40,7 @@ func main() {
 			logrus.WithError(err).Errorf("failed to convert line %s to int", line)
 			continue
 		}
-		totalFuel = totalFuel + GetFuel(int64(mass))
+		totalFuel = totalFuel + GetFuelExtended(int64(mass))
 	}
 	fmt.Println(totalFuel)
 }
