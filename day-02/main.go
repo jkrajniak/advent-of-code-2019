@@ -29,8 +29,8 @@ func Process(tape []int) {
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		splittedLine := strings.Split(scanner.Text(), ",")
-		tape, err := convertToIntSlice(splittedLine)
+		splitLine := strings.Split(scanner.Text(), ",")
+		tape, err := convertToIntSlice(splitLine)
 		if err != nil {
 			logrus.WithError(err).Error("failed convert to array of ints")
 		}
