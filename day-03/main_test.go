@@ -35,7 +35,7 @@ func TestCrossingPoints(t *testing.T) {
 		Steps:     5,
 	})
 	assert.Equal(t, 6, len(pointsA))
-	assert.Equal(t, []Point{{0,0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}}, pointsA)
+	assert.Equal(t, []Point{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}}, pointsA)
 	pointsB := GetSegmentPoints(Point{1, 5}, Command{
 		Direction: "D",
 		Steps:     8,
@@ -44,7 +44,6 @@ func TestCrossingPoints(t *testing.T) {
 	crossPoints := FindCrossingPoints(pointsA, pointsB)
 	assert.Equal(t, []Point{{1, 0}}, crossPoints)
 }
-
 
 func TestCrossingPoints_ShortA(t *testing.T) {
 	pointsA := GetSegmentPoints(Point{0, 0}, Command{
@@ -59,4 +58,25 @@ func TestCrossingPoints_ShortA(t *testing.T) {
 	assert.Equal(t, 9, len(pointsB))
 	crossPoints := FindCrossingPoints(pointsA, pointsB)
 	assert.Equal(t, []Point{{1, 0}}, crossPoints)
+}
+
+func TestNumStepsToReachPoint(t *testing.T) {
+	testCases := []struct {
+		RAWCmd   string
+		NumSteps int
+		Intersect Point
+	}{
+		{"R8,U5,L5,D3", 20, Point{3, 3}},
+		{"U7,R6,D4,L4", 20, Point{3, 3}},
+		{"R8,U5,L5,D3", 15, Point{6, 5}},
+		{"U7,R6,D4,L4", 15, Point{6, 5}},
+	}
+	for i, c := range testCases {
+		t.Run(fmt.Sprintf("test-%d", i), func(tt *testing.T) {
+			cmds := ConvertToCommands(c.RAWCmd)
+			path := GetPathPoints(Point{}, cmds)
+			numSteps := FindPathLengthToPoint(c.Intersect, path)
+			assert.Equal(tt, c.NumSteps, numSteps)
+		})
+	}
 }

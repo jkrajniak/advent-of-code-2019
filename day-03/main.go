@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -55,24 +57,20 @@ func GetSegmentPoints(start Point, cmd Command) []Point {
 
 func FindCrossingPoints(pointsA []Point, pointsB []Point) []Point {
 	var crossPoints []Point
-	setA := pointsA
-	setB := pointsB
-
-	for a := 0; a < len(pointsA); a = a + 1 {
-		for b := a + 1; b < len(pointsB); b = b + 1 {
-			pA := pointsA[a]
-			pB := pointsB[b]
-			if pA.Equal(pB) {
+	for _, pA := range pointsA {
+		for _, pB := range pointsB {
+			if pA.Equal(pB) && !pA.Equal(Point{0, 0}){
 				crossPoints = append(crossPoints, pA)
 			}
 		}
 	}
+
 	return crossPoints
 }
 
 func GetClosestDistanceToCentral(points []Point) (int, Point) {
 	lastDistance := math.MaxInt64
-	centralPoint := Point{0,0}
+	centralPoint := Point{0, 0}
 	lastPoint := centralPoint
 	for _, p := range points {
 		if p.Equal(centralPoint) {
@@ -89,11 +87,11 @@ func GetClosestDistanceToCentral(points []Point) (int, Point) {
 
 func GetPathPoints(start Point, cmds []Command) []Point {
 	lastPoint := start
-	points := []Point{}
+	points := []Point{start}
 	for _, cmd := range cmds {
 		p := GetSegmentPoints(lastPoint, cmd)
 		lastPoint = p[len(p)-1]
-		points = append(points, p...)
+		points = append(points, p[1:]...)
 	}
 	return points
 }
@@ -111,16 +109,25 @@ func ConvertToCommands(line string) []Command {
 	return commands
 }
 
+func FindPathLengthToPoint(point Point, path []Point) int {
+	for i := 0; i < len(path); i = i + 1 {
+		if path[i].Equal(point) {
+			return i
+		}
+	}
+	return 0
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	linesBuffer := []string{}
 	idx := 0
 	for scanner.Scan() {
 		linesBuffer = append(linesBuffer, scanner.Text())
-		if idx % 2 == 1 {
+		if idx%2 == 1 {
 			var wg sync.WaitGroup
 			wg.Add(2)
-			paths := [][]Point{}
+			var paths [][]Point
 			for _, l := range linesBuffer {
 				go func(ll string) {
 					defer wg.Done()
@@ -130,10 +137,27 @@ func main() {
 				}(l)
 			}
 			wg.Wait()
-			fmt.Println("ended processing, find cross points")
 			crossPoints := FindCrossingPoints(paths[0], paths[1])
+			logrus.Debug("calculate closest distance to central")
 			closestDistance, _ := GetClosestDistanceToCentral(crossPoints)
 			fmt.Printf("distance: %d\n", closestDistance)
+
+			wg.Add(len(crossPoints))
+			var distancesToCrossing []int
+			for _, crPoint := range crossPoints {
+				go func(p Point) {
+					defer wg.Done()
+
+					numStepsA := FindPathLengthToPoint(p, paths[0])
+					numStepsB := FindPathLengthToPoint(p, paths[1])
+					distancesToCrossing = append(distancesToCrossing, numStepsA+numStepsB)
+				}(crPoint)
+			}
+			wg.Wait()
+			sort.Ints(distancesToCrossing)
+
+			fmt.Printf("min num steps to intersection: %d\n", distancesToCrossing[0])
+
 			linesBuffer = []string{}
 		}
 		idx = idx + 1
