@@ -125,6 +125,17 @@ func ComputeThrust(program []int, phase []int) int {
 	return inputSignal
 }
 
+
+func ComputeThrustLoop(program []int, phase []int) int {
+	inputSignal := 0
+	for _, c := range phase {
+		programCopy := make([]int, len(program))
+		copy(programCopy, program)
+		inputSignal = Process(programCopy, []int{c, inputSignal})
+	}
+	return inputSignal
+}
+
 func GetHighestThrust(program []int) int {
 	maxThrust := 0
 	for perm := range getPermutations([]int{0, 1, 2, 3, 4}) {

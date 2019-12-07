@@ -88,3 +88,23 @@ func TestThrust(t *testing.T) {
 		})
 	}
 }
+
+func TestExtendThurst(t *testing.T) {
+	testCase := []struct {
+		Tape   []int
+		Phase  []int
+		Output int
+	}{{
+		[]int{3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,
+			27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5},
+		[]int{9,8,7,6,5},
+		43210,
+	}}
+
+	for i, c := range testCase {
+		t.Run(fmt.Sprintf("test-%d", i), func(tt *testing.T) {
+			thrust := ComputeThrustLoop(c.Tape, c.Phase)
+			assert.Equal(tt, c.Output, thrust)
+		})
+	}
+}
