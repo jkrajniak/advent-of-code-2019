@@ -97,19 +97,6 @@ func MakeImage(data []int) {
 		}
 	}
 	f, _ := os.Create("image.png")
-	
+
 	png.Encode(f, img)
-}
-
-
-func convertToIntSlice(s []string) ([]int, error) {
-	var ints []int
-	for _, s := range s {
-		i, err := strconv.Atoi(strings.Trim(s, "\n"))
-		if err != nil {
-			return nil, err
-		}
-		ints = append(ints, i)
-	}
-	return ints, nil
 }
