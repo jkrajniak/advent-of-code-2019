@@ -51,7 +51,9 @@ func TestProcess(t *testing.T) {
 
 	for _, c := range testCases {
 		t.Run(fmt.Sprintf("test-%+v", c.Tape), func(tt *testing.T) {
-			cpu := NewInterCode(c.Tape)
+			in := make(chan int64)
+			out := make(chan int64)
+			cpu := NewInterCode(c.Tape, in, out)
 			cpu.Process()
 			assert.Equal(tt, c.ExpectedValue, cpu.GetValue(c.Ref, 0))
 		})
