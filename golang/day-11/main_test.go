@@ -59,8 +59,10 @@ func TestProcess(t *testing.T) {
 }
 
 func TestRelativeBase(t *testing.T) {
+	in := make(chan int64)
+	out := make(chan int64)
 	tape := []int64{109, 19, 99}
-	cpu := NewInterCode(tape)
+	cpu := NewInterCode(tape, in, out)
 	cpu.Process()
 	assert.Equal(t, int64(19), cpu.relativeAddress)
 }
@@ -68,18 +70,24 @@ func TestRelativeBase(t *testing.T) {
 
 func TestCopyItself(t *testing.T) {
 	tape := []int64{109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99}
-	cpu := NewInterCode(tape)
+	in := make(chan int64)
+	out := make(chan int64)
+	cpu := NewInterCode(tape, in, out)
 	cpu.Process()
 }
 
 func TestLargeNumber(t *testing.T) {
 	tape := []int64{104,1125899906842624,99}
-	cpu := NewInterCode(tape)
+	in := make(chan int64)
+	out := make(chan int64)
+	cpu := NewInterCode(tape, in, out)
 	cpu.Process()
 }
 
 func Test16digit(t *testing.T) {
 	tape := []int64{1102,34915192,34915192,7,4,7,99,0}
-	cpu := NewInterCode(tape)
+	in := make(chan int64)
+	out := make(chan int64)
+	cpu := NewInterCode(tape, in, out)
 	cpu.Process()
 }
