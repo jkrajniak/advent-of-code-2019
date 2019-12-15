@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -40,10 +41,10 @@ func main() {
 	outCh := make(chan int64)
 	cpu := NewInterCode(tape, inCh, outCh)
 
-	direction := Point{0, 1}
+	direction := Point{0, -1}
 	position := Point{0, 0}
 
-	board := map[Point]int64{position: BLACK}
+	board := map[Point]int64{position: WHITE}
 	visited := map[Point]int64{position: 1}
 
 	go cpu.Process()
@@ -76,6 +77,31 @@ func main() {
 	}
 
 	fmt.Printf("num of painted tails = %d", len(board))
+
+	minX, maxX := 0, 0
+	minY, maxY := 0, 0
+	for p, _ := range board {
+		minX = int(math.Min(float64(minX), float64(p.X)))
+		maxX = int(math.Max(float64(maxX), float64(p.X)))
+		minY = int(math.Min(float64(minY), float64(p.Y)))
+		maxY = int(math.Max(float64(maxY), float64(p.Y)))
+	}
+
+	fmt.Printf("X = %d:%d, Y = %d:%d", minX, maxX, minY, maxY)
+
+	fmt.Println("\nBoard:")
+	for y := minY; y <= maxY; y++ {
+		for x := minX; x <= maxX; x++ {
+			if v, ok := board[Point{int64(x), int64(y)}]; ok {
+				c := '#'
+				if v == 0 {
+					c = ' '
+				}
+				fmt.Printf("%c", c)
+			}
+		}
+		fmt.Println()
+	}
 }
 
 func convertToIntSlice(s []string) ([]int64, error) {
