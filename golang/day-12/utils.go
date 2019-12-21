@@ -27,6 +27,7 @@ func mustInt(s string) int64 {
 
 func Read(scanner *bufio.Scanner) []Moon {
 	var moons []Moon
+	moonID := int64(0)
 	for scanner.Scan() {
 		line := scanner.Text()
 		result := moonsPositionExp.FindStringSubmatch(line)
@@ -34,8 +35,8 @@ func Read(scanner *bufio.Scanner) []Moon {
 			X: mustInt(result[1]),
 			Y: mustInt(result[2]),
 			Z: mustInt(result[3]),
-		}})
-
+		}, ID: moonID})
+		moonID++
 	}
 
 	return moons
