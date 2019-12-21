@@ -4,6 +4,10 @@ type Point3D struct {
 	X, Y, Z int64
 }
 
+func (p *Point3D) Equal(b Point3D) bool {
+	return p.X == b.X && p.Y == b.Y && p.Z == b.Z
+}
+
 func (p *Point3D) Add(b Point3D) {
 	p.X += b.X
 	p.Y += b.Y
